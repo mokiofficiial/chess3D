@@ -15,9 +15,15 @@ function kingPos(b,c){for(let j=0;j<8;j++)for(let i=0;i<8;i++){const q=b[j][i];i
 const inChk=(b,c)=>{const k=kingPos(b,c);return attacked(b,k[0],k[1],opp(c))};
 function legal(b,x,y){const p=b[y][x],out=[];
   for(const m of pm(b,x,y)){const nb=b.map(r=>r.slice());nb[m[1]][m[0]]=p;nb[y][x]=null;if(!inChk(nb,p.c))out.push(m)}
+  if(p.t=='p'&&b===B&&EP&&EP[1]==y+(p.c=='w'?1:-1)&&Math.abs(EP[0]-x)==1){const v=b[y][EP[0]];
+    if(v&&v.t=='p'&&v.c!=p.c){const nb=b.map(r=>r.slice());nb[EP[1]][EP[0]]=p;nb[y][x]=null;nb[y][EP[0]]=null;if(!inChk(nb,p.c))out.push([EP[0],EP[1],'e'])}}
   if(p.t=='k'&&!p.m&&!inChk(b,p.c)){const o=opp(p.c);
     [[7,[5,6],[5,6],6],[0,[1,2,3],[2,3],2]].forEach(([rx,em,sf,tx])=>{const r=b[y][rx];
       if(r&&r.t=='r'&&!r.m&&em.every(i=>!b[y][i])&&sf.every(i=>!attacked(b,i,y,o)))out.push([tx,y,'c'])})}
   return out}
+/* only bare kings, or one minor piece, or bishops all on one colour: nobody can mate */
+function noMate(b,c){const L=[];for(let j=0;j<8;j++)for(let i=0;i<8;i++){const q=b[j][i];if(q&&q.t!='k'&&(!c||q.c==c))L.push([q.t,(i+j)%2])}
+  if(!L.length)return true;if(L.some(q=>q[0]=='p'||q[0]=='r'||q[0]=='q'))return false;
+  if(L.length==1)return true;return L.every(q=>q[0]=='b'&&q[1]==L[0][1])}
 const anyMove=(b,c)=>{for(let j=0;j<8;j++)for(let i=0;i<8;i++)if(b[j][i]&&b[j][i].c==c&&legal(b,i,j).length)return 1;return 0};
 

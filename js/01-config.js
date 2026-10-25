@@ -1,7 +1,7 @@
 const $=s=>document.querySelector(s);
 const CFG={mode:'ai',bot:4,theme:'classic',human:'w',tc:600,q:'auto',snd:1,vib:1,hints:1,shake:1,blast:1,flip:0,kfx:1};
 try{const o=JSON.parse(localStorage.getItem('gambit.cfg')||'{}');for(const k in CFG)if(k in o&&typeof o[k]==typeof CFG[k])CFG[k]=o[k]}catch(e){}
-CFG.bot=Math.max(0,Math.min(9,CFG.bot|0));if(CFG.theme!='mc')CFG.theme='classic';
+CFG.bot=Math.max(0,Math.min(13,CFG.bot|0));if(CFG.theme!='mc')CFG.theme='classic';
 const saveCfg=()=>{try{localStorage.setItem('gambit.cfg',JSON.stringify(CFG))}catch(e){}};
 const vib=p=>{try{if(CFG.vib&&navigator.vibrate)navigator.vibrate(p)}catch(e){}};
 const mo=(el,kf,o)=>{try{return Motion.animate(el,kf,o||{})}catch(e){el.style.opacity=1}};

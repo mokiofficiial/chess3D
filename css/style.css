@@ -131,3 +131,38 @@ html.mc .moki b{background:none;-webkit-background-clip:initial;background-clip:
 html.mc .moki .cr{color:#fff;text-shadow:2px 2px 0 #3f3f3f}html.mc .moki img{border-radius:0;box-shadow:inset 0 0 0 2px #000}
 html.mc #cred .credi,html.mc .cruta{border-radius:0}html.mc .crName b{background:none;-webkit-background-clip:initial;background-clip:initial;color:#ffff55;text-shadow:3px 3px 0 #3f3f00}html.mc .crName span{color:#fff}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}.moki{animation:none}}
+/* ---------- bot picker: hero + grid ---------- */
+#botHero{display:flex;gap:14px;align-items:center;text-align:left;padding:12px;margin-bottom:6px;border-radius:14px;background:rgba(0,0,0,.28);box-shadow:inset 0 0 0 1px rgba(200,160,90,.25)}
+#botHero .av{width:72px;height:72px;font-size:40px}
+#botHero .bn{font:600 24px/1.1 var(--serif)}#botHero .be{margin:2px 0 4px;font:600 14px var(--sans);color:var(--brass2)}
+#botList{max-height:38vh}
+.bgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(94px,1fr));gap:8px}
+.bt{flex-direction:column;gap:4px;padding:10px 4px 8px;min-height:0;background:rgba(255,255,255,.03);border:1px solid rgba(200,160,90,.15);box-shadow:none;border-radius:12px;font:inherit;color:var(--iv)}
+.bt:hover,.bt:focus-visible{background:rgba(232,201,130,.12);color:var(--iv);border-color:var(--brass3)}
+.bt .av{width:46px;height:46px;font-size:26px}
+.bt .bn{font:600 13px/1.1 var(--serif);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.bt .be{margin:0;font:600 14px var(--sans);color:var(--brass2)}
+.bt.on{box-shadow:0 0 0 2px var(--brass2),0 0 18px rgba(232,201,130,.25)}
+.bots .sr{margin-top:6px}
+#botBack{display:block;margin:6px auto 0}
+/* ---------- in-game bits ---------- */
+.cap em{font:600 13px var(--sans);font-style:normal;color:var(--brass2);margin-left:6px;vertical-align:2px}
+#st.think::after{content:'';display:inline-block;width:1.2em;text-align:left;animation:dots 1.2s steps(4,end) infinite}
+@keyframes dots{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}}
+#brs.sure{background:linear-gradient(180deg,#c2495a,#8e2a35);color:#fff;border-color:var(--ox2)}
+.obr{display:flex;flex-direction:column;gap:8px;align-items:stretch}
+.cert .mb{width:100%;min-height:46px;font-size:17px}
+#promo{position:fixed;inset:0;z-index:15;display:none;place-items:center;background:rgba(8,5,3,.55);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+#promo .pc{padding:16px 16px 14px;border-radius:16px;text-align:center;background:var(--noise),linear-gradient(160deg,#37231a,#1b100b);box-shadow:0 24px 60px rgba(0,0,0,.7),inset 0 0 0 1px var(--brass3)}
+#promo p{margin:0 0 10px;font:600 18px var(--serif);color:var(--brass2)}
+#promo .pr{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+#promo button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 8px 8px;min-width:68px}
+#promo button span{font:44px/1 var(--serif)}#promo button small{font:500 12px var(--sans)}
+html.mc #botHero{border-radius:0;background:#2b2b2b;box-shadow:inset 0 0 0 3px #000}
+html.mc .bt{border-radius:0;background:#4a4a4a;border:none;box-shadow:inset 0 0 0 2px #000,inset 3px 3px 0 #6b6b6b,inset -3px -3px 0 #2a2a2a;text-shadow:none}
+html.mc .bt:hover{background:#5a5f80}
+html.mc .bt.on{background:#3d6b2a;box-shadow:inset 0 0 0 2px #000,inset 3px 3px 0 #8bd450,inset -3px -3px 0 #2c5f16}
+html.mc .bt .be,html.mc #botHero .be,html.mc .cap em{color:#ffff55}
+html.mc #promo .pc{border-radius:0;background:#3a3a3a;box-shadow:0 8px 0 rgba(0,0,0,.35),inset 0 0 0 3px #000,inset 6px 6px 0 #6b6b6b,inset -6px -6px 0 #1f1f1f}
+html.mc #promo p{color:#ffff55;text-shadow:2px 2px 0 #3f3f00}
+html.mc #brs.sure{background:#a33;border-color:#e66 #511 #511 #e66}

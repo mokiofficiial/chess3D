@@ -1,28 +1,20 @@
-/* ---------- AI ---------- */
-const PV={p:100,n:320,b:330,r:500,q:900,k:20000};
-function evalB(b){let s=0;for(let j=0;j<8;j++)for(let i=0;i<8;i++){const q=b[j][i];if(!q)continue;let v=PV[q.t];const cd=Math.abs(i-3.5)+Math.abs(j-3.5);
-  if(q.t=='n'||q.t=='b')v+=(7-cd)*5;else if(q.t=='p')v+=(q.c=='w'?j:7-j)*8+(7-cd)*2;else if(q.t=='q')v+=(7-cd)*1.5;
-  s+=q.c=='w'?v:-v}return s}
-function gen(b,c){const r=[];for(let j=0;j<8;j++)for(let i=0;i<8;i++){const q=b[j][i];if(q&&q.c==c)for(const m of pm(b,i,j))r.push([i,j,m[0],m[1]])}
-  const sc=m=>{const t=b[m[3]][m[2]];return t?PV[t.t]*10-PV[b[m[1]][m[0]].t]:0};return r.sort((a,d)=>sc(d)-sc(a))}
-function app(b,m){const nb=b.map(r=>r.slice());let p=nb[m[1]][m[0]];if(p.t=='p'&&(m[3]==0||m[3]==7))p={t:'q',c:p.c};nb[m[3]][m[2]]=p;nb[m[1]][m[0]]=null;return nb}
-function qs(b,a,be,c,q){const st=(c=='w'?1:-1)*evalB(b);if(q==0||st>=be)return st;if(st>a)a=st;
-  for(const m of gen(b,c)){const t=b[m[3]][m[2]];if(!t)continue;if(t.t=='k')return 1e5;const v=-qs(app(b,m),-be,-a,opp(c),q-1);if(v>=be)return v;if(v>a)a=v}return a}
-let DL=0,NC=0,QD=2;const TO={};
-function nega(b,d,a,be,c){if((++NC&1023)==0&&DL&&Date.now()>DL)throw TO;if(d==0)return qs(b,a,be,c,QD);let best=-1e9;
-  for(const m of gen(b,c)){const t=b[m[3]][m[2]];if(t&&t.t=='k')return 1e5+d;const v=-nega(app(b,m),d-1,-be,-a,opp(c));if(v>best)best=v;if(v>a)a=v;if(a>=be)break}return best}
-async function aiPick(c,id){const bt=BOTS[lvl];QD=bt.qd;const root=[];
-  for(let j=0;j<8;j++)for(let i=0;i<8;i++){const q=B[j][i];if(q&&q.c==c)for(const m of legal(B,i,j))root.push({i,j,m,s:0})}
-  if(!root.length)return null;
-  if(Math.random()<bt.b){const r=root[Math.random()*root.length|0];return [r.i,r.j,r.m]}
-  DL=bt.t?Date.now()+bt.t*(MOB?.7:1):0;NC=0;let pick=null,sl=Date.now();
-  for(let d=1;d<=bt.d;d++){let bs=-1e9;
-    try{for(const r of root){const v=-nega(app(B,[r.i,r.j,r.m[0],r.m[1]]),d-1,-1e9,bt.r>5?1e9:-bs,opp(c));r.s=v;if(v>bs)bs=v;
-        if(Date.now()-sl>10){await new Promise(z=>setTimeout(z,0));sl=Date.now();if(id!=G)return null}}}
-    catch(e){if(e!==TO)throw e;break}
-    root.sort((x,y)=>y.s-x.s);pick=root.map(r=>({r,s:r.s+Math.random()*bt.r})).sort((x,y)=>y.s-x.s)[0].r}
-  DL=0;if(!pick)pick=root[0];return [pick.i,pick.j,pick.m]}
-function aiTurn(){const c=aiC();if(!c||over||turn!=c)return;busy=true;status();const id=G;
-  setTimeout(async()=>{if(id!=G||over)return;const t0=Date.now(),m=await aiPick(c,id);if(!m||id!=G||over)return;
-    setTimeout(()=>{if(id==G&&!over)move(m[0],m[1],m[2])},Math.max(0,BOTS[lvl].ms-(Date.now()-t0)))},350)}
-
+/* ---------- AI: js/engine.js searches in a Web Worker so the board never freezes ---------- */
+let EW=null,EWn=0;const EWq=new Map();
+function mainEngine(o){return new Promise(res=>{const go=()=>{try{res(GambitEngine.think(o))}catch(e){res(null)}};
+  if(window.GambitEngine)return setTimeout(go,30);const s=document.createElement('script');s.src='js/engine.js';s.onload=()=>setTimeout(go,30);s.onerror=()=>res(null);document.head.appendChild(s)})}
+function spawnEngine(){try{EW=new Worker('js/engine.js');
+  EW.onmessage=e=>{const q=EWq.get(e.data.id);if(q){EWq.delete(e.data.id);q.res(e.data.r)}};
+  EW.onerror=e=>{if(e&&e.preventDefault)e.preventDefault();EW=null;EWq.forEach(q=>mainEngine(q.o).then(q.res));EWq.clear()}}catch(e){EW=null}}
+spawnEngine();
+function engineReset(){if(EW&&EWq.size){EW.terminate();EWq.forEach(q=>q.res(null));EWq.clear();spawnEngine()}}
+function engineThink(o){if(!EW)return mainEngine(o);return new Promise(res=>{const id=++EWn;EWq.set(id,{o,res});EW.postMessage(Object.assign({id},o))})}
+function anyLegal(c){const L=[];for(let j=0;j<8;j++)for(let i=0;i<8;i++){const q=B[j][i];if(q&&q.c==c)for(const m of legal(B,i,j))L.push([i,j,m,'q'])}return L[Math.random()*L.length|0]}
+function aiTurn(){const c=aiC();if(!c||over||turn!=c)return;busy=true;status();const id=G,bt=BOTS[lvl],t0=Date.now();
+  let budget=bt.t*(MOB?.8:1);if(CFG.tc&&budget)budget=Math.min(budget,Math.max(250,time[c]*1000/35));
+  setTimeout(async()=>{if(id!=G||over)return;
+    const r=await engineThink({moves:ML.slice(),depth:bt.d,time:budget,noise:bt.r,vary:bt.v||0,blunder:bt.b,qs:bt.qs!==0});
+    if(id!=G||over)return;
+    let mv=null;if(r&&r.f){const m=legal(B,r.f[0],r.f[1]).find(m=>m[0]==r.t[0]&&m[1]==r.t[1]);if(m)mv=[r.f[0],r.f[1],m,r.p||'q']}
+    if(!mv)mv=anyLegal(c);if(!mv)return;
+    const go=()=>{if(id!=G||over)return;if(paused)return setTimeout(go,250);move(mv[0],mv[1],mv[2],mv[3])};
+    setTimeout(go,Math.max(0,bt.ms-(Date.now()-t0)))},300)}

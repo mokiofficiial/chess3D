@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Chess 3D</title>
+<title>Gambit — 3D Chess</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -25,15 +25,16 @@
 <div id="fx"></div>
 <div id="tt"><span id="toast"></span></div>
 <div id="sayw"><div id="say"><span class="av" id="sayAv"></span><span id="sayTx"></span></div></div>
-<div id="bar"><button id="bn">New game</button><button id="bf">Turn board</button><button id="bmenu">Menu</button></div>
-<div id="ov"><div class="cert"><div class="seal">♔</div><h2 id="ot">White takes the game</h2><p id="os">Checkmate</p><button id="ob">Play again</button></div></div>
+<div id="bar"><button id="bn">New game</button><button id="bf">Turn board</button><button id="brs" style="display:none">Resign</button><button id="bmenu">Menu</button></div>
+<div id="promo"></div>
+<div id="ov"><div class="cert"><div class="seal">♔</div><h2 id="ot">White takes the game</h2><p id="os">Checkmate</p><div class="obr"><button id="ob" class="mb pri">Rematch</button><button id="obb" class="mb">Change bot</button></div></div></div>
 <div id="sp"><div class="mtop"><div class="r8">♜ ♞ ♝ ♛ ♚ ♝ ♞ ♜</div><h1 id="wm"></h1><p>A private chess salon, open tonight</p></div>
 <div class="mbtns"><button class="mb pri" id="mResume" style="display:none">Resume game</button><button class="mb pri" id="mAi">Play the bots</button><button class="mb" id="m2p">Play a friend</button><button class="mb" id="mSet">Settings</button><div class="duo"><button class="mb" id="mHow">How to play</button><button class="mb" id="mCred">Credits</button></div><button class="mb" id="mIns">Install · offline</button><small>Drag to turn the board. Pinch or scroll to zoom.</small></div>
 <div class="moki" id="mok" title="Gambit is made by Moki Studio"><img src="moki.png" alt="Moki mascot"><span class="cr">Made by</span><b>Moki</b></div></div>
 <div class="pg" id="set"><div class="pgc"><h2>Settings</h2><div id="setRows"></div><p class="note">Changing opponent, strength, side or clock starts a new game.</p><button class="mb pri" id="setDone">Done</button><button class="lnk" id="setReset">Reset to defaults</button></div></div>
-<div class="pg" id="how"><div class="pgc"><h2>How to play</h2><ul class="how"><li>Tap a piece, then tap a glowing square to move it.</li><li>Drag to turn the board, pinch or scroll to zoom.</li><li>Every piece captures in its own way. Watch for it.</li><li>The moves are written on the scoresheet beside the board.</li><li>Checkmate the king and the whole board goes up in flames.</li><li>Graphics, clock and sound live in Settings.</li></ul><button class="mb pri" id="howDone">Got it</button></div></div>
+<div class="pg" id="how"><div class="pgc"><h2>How to play</h2><ul class="how"><li>Tap a piece, then tap a glowing square to move it.</li><li>Drag to turn the board, pinch or scroll to zoom.</li><li>Every piece captures in its own way. Watch for it.</li><li>Full rules: castling, en passant, promotion (you pick the piece), and draws by repetition, the 50-move rule or bare kings.</li><li>14 bots from 100 to 2800. The top ones do not make mistakes.</li><li>The moves are written on the scoresheet beside the board.</li><li>Checkmate the king and the whole board goes up in flames.</li><li>Graphics, clock and sound live in Settings.</li></ul><button class="mb pri" id="howDone">Got it</button></div></div>
 <div class="pg" id="cred"><div class="pgc"><h2>Credits</h2><img class="credi" src="moki.png" alt="Moki mascot"><p class="crName"><span>Made by</span><b>Moki</b></p><div class="crBody"><p>Gambit — 3D Chess</p><p>Created by <b>Rishav Ranjan</b> &amp; <b>M Gyaani</b>.</p><p class="crAb">MOKI is a creative design &amp; product studio — websites, UI/UX, illustrations and digital products.<br><span class="crTag">“Ideas made tangible.”</span></p></div><button class="mb pri" id="credDone">Got it</button></div></div>
-<div class="pg" id="bots"><div class="pgc bots"><h2>Choose your opponent</h2><div id="botList"></div><div class="sr"><label>You play</label><div class="seg" id="botSide"></div></div><button class="mb pri" id="botGo">Play</button><button class="lnk" id="botBack">Back</button></div></div>
+<div class="pg" id="bots"><div class="pgc bots"><h2>Choose your opponent</h2><div id="botHero"></div><div id="botList"></div><div class="sr"><label>You play</label><div class="seg" id="botSide"></div></div><button class="mb pri" id="botGo">Play</button><button class="lnk" id="botBack">Back</button></div></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>

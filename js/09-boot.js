@@ -1,5 +1,5 @@
 /* ---------- boot ---------- */
-let lt=0,fcSkip=0;(function loop(t){requestAnimationFrame(loop);const dr=(t-lt)/1000||0;fxStep(Math.min(.05,dr));lt=t;adapt(dr);if(demo&&booted){cs.th+=Math.min(dr,.05)*.14;setCam()}if(anime.running.length||wreck||FE.length)shHold=4;if(shHold>0){R.shadowMap.needsUpdate=true;shHold--}if(cloudG.visible)cloudG.rotation.y+=Math.min(dr,.05)*.012;t*=.0006;
+let lt=0,fcSkip=0;(function loop(t){requestAnimationFrame(loop);const dr=(t-lt)/1000||0;fxStep(Math.min(.05,dr));lt=t;adapt(dr);if(demo&&booted){cs.th+=Math.min(dr,.05)*.14;setCam()}if(anime.running.length||wreck||FE.length)shHold=4;if(shHold>0){R.shadowMap.needsUpdate=true;shHold--}if(cloudG.visible){cloudG.rotation.y+=Math.min(dr,.05)*.012;mcTick(t)}t*=.0006;
   dust.rotation.y=t*.4;dust.position.y=Math.sin(t*2)*.25;L1.position.set(Math.cos(t)*7,5,Math.sin(t)*7);L2.position.set(-Math.cos(t*.8)*7,5,-Math.sin(t*.8)*7);if(!(demo&&booted&&!anime.running.length&&!wreck&&!FE.length&&(fcSkip^=1)))R.render(S,cam)})(0);
 /* ---------- graphics quality (phone friendly) ---------- */
 const QP={low:{pr:1,sh:0,ss:512,pp:120,dust:0,lt:0,an:1},med:{pr:1.5,sh:1,ss:1024,pp:240,dust:1,lt:1,an:2},high:{pr:1.5,sh:1,ss:1024,pp:360,dust:1,lt:1,an:4}};
@@ -28,15 +28,15 @@ function renderSet(){const box=$('#setRows');box.innerHTML='';
     box.appendChild(r)})}
 /* ---------- bot picker ---------- */
 const avatar=b=>'<span class="av" style="background:radial-gradient(circle at 35% 30%,'+b.c+',#2a1a12)">'+b.g+'\uFE0E</span>';
-function renderBots(){const L=$('#botList');L.innerHTML='';let tier='';
-  BOTS.forEach((b,i)=>{if(b.tier!==tier){tier=b.tier;const h=document.createElement('div');h.className='th';h.textContent=tier;L.appendChild(h)}
-    const d=document.createElement('div');d.className='bt'+(i==lvl?' on':'');
-    d.innerHTML=avatar(b)+'<div class="bi"><div class="bn">'+b.n+' <span class="be">'+b.e+'</span></div><div class="bq">'+b.q+'</div><div class="lv"><i style="width:'+Math.round((b.e-250)/21.5)+'%"></i></div></div>';
-    d.onclick=()=>{CFG.bot=lvl=i;saveCfg();renderBots()};L.appendChild(d)});
+function renderBots(){const L=$('#botList'),b0=BOTS[lvl];L.innerHTML='';let tier='',grid=null;
+  $('#botHero').innerHTML=avatar(b0)+'<div class="bi"><div class="bn">'+b0.n+'</div><div class="be">'+b0.e+' · '+b0.tier+'</div><div class="bq">'+b0.q+'</div><div class="lv"><i style="width:'+Math.round(4+(b0.e-100)/2700*96)+'%"></i></div></div>';
+  BOTS.forEach((b,i)=>{if(b.tier!==tier){tier=b.tier;const h=document.createElement('div');h.className='th';h.textContent=tier;L.appendChild(h);grid=document.createElement('div');grid.className='bgrid';L.appendChild(grid)}
+    const d=document.createElement('button');d.className='bt'+(i==lvl?' on':'');d.title=b.n+' '+b.e;
+    d.innerHTML=avatar(b)+'<span class="bn">'+b.n+'</span><span class="be">'+b.e+'</span>';
+    d.onclick=()=>{const keep=L.scrollTop;CFG.bot=lvl=i;saveCfg();renderBots();L.scrollTop=keep;mo($('#botHero'),{opacity:[.4,1],x:[-8,0]},{duration:.25})};grid.appendChild(d)});
   const sg=$('#botSide');sg.innerHTML='';
-  [['w','White'],['b','Black'],['r','Random']].forEach(([v,t])=>{const x=document.createElement('button');x.textContent=t;if(CFG.human===v)x.className='on';x.onclick=()=>{CFG.human=v;human=v=='r'?'w':v;saveCfg();renderBots()};sg.appendChild(x)});
-  const on=L.querySelector('.on');if(on&&on.scrollIntoView)on.scrollIntoView({block:'nearest'})}
-function openBots(){$('#bots').style.display='flex';renderBots()}
+  [['w','White'],['b','Black'],['r','Random']].forEach(([v,t])=>{const x=document.createElement('button');x.textContent=t;if(CFG.human===v)x.className='on';x.onclick=()=>{CFG.human=v;human=v=='r'?'w':v;saveCfg();renderBots()};sg.appendChild(x)})}
+function openBots(){$('#bots').style.display='flex';renderBots();const on=$('#botList .on');if(on&&on.scrollIntoView)on.scrollIntoView({block:'center'})}
 $('#botGo').onclick=()=>{$('#bots').style.display='none';$('#set').style.display='none';startGame('ai')};
 $('#botBack').onclick=()=>{$('#bots').style.display='none'};
 let sayT;function say(t,i){const b=BOTS[i],e=$('#say'),av=$('#sayAv');av.style.background='radial-gradient(circle at 35% 30%,'+b.c+',#2a1a12)';av.textContent=b.g+'\uFE0E';$('#sayTx').textContent=b.n+': '+t;

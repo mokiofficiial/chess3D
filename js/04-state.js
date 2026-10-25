@@ -1,23 +1,27 @@
 /* ---------- state ---------- */
-let B,P,pcs=[],turn,sel,legalM,busy=true,over=false,started=false,moves=0,caps,score,time,last=[],chk=null;
+let EP=null,ML=[],RP={},HM=0,promoAsk=null,B,P,pcs=[],turn,sel,legalM,busy=true,over=false,started=false,moves=0,caps,score,time,last=[],chk=null;
 const wins={w:0,b:0};
 let mode=CFG.mode,lvl=CFG.bot,human=CFG.human=='r'?'w':CFG.human,G=0,paused=false,demo=true,dirty=false,hudOn=false,shHold=4,prCap=1,prCur=1,ft=.0167,fc=0,qKey='',booted=false,hist=[],resTxt='',selG=null,bk='';const aiC=()=>mode=='ai'?opp(human):null;const BOTS=[
- {n:'Pip',e:250,g:'♟',c:'#8fb7a0',q:'“Is this the pointy horse?”',d:1,r:420,b:.45,qd:0,ms:500,t:0,tier:'Beginner'},
- {n:'Nora',e:400,g:'♟',c:'#b9a27a',q:'“I just like capturing things.”',d:1,r:300,b:.3,qd:0,ms:600,t:0,tier:'Beginner'},
- {n:'Biscuit',e:600,g:'♞',c:'#c98f6b',q:'“Snacks first, strategy later.”',d:1,r:180,b:.18,qd:1,ms:700,t:0,tier:'Beginner'},
- {n:'Otto',e:800,g:'♞',c:'#7fa0c9',q:'“I know the openings. Mostly.”',d:1,r:100,b:.1,qd:2,ms:800,t:0,tier:'Casual'},
- {n:'Mira',e:1000,g:'♝',c:'#a58cc9',q:'“Keep an eye on the diagonals.”',d:2,r:80,b:.05,qd:2,ms:900,t:0,tier:'Casual'},
- {n:'Dev',e:1200,g:'♜',c:'#d1a06a',q:'“Solid. Patient. Annoying.”',d:2,r:45,b:.02,qd:2,ms:1000,t:0,tier:'Casual'},
- {n:'Sasha',e:1500,g:'♝',c:'#7fc9b3',q:'“Your queen looks nervous.”',d:2,r:20,b:0,qd:3,ms:1100,t:0,tier:'Club'},
- {n:'Kai',e:1800,g:'♛',c:'#e08a7a',q:'“I calculate three moves ahead.”',d:3,r:12,b:0,qd:2,ms:1100,t:1000,tier:'Club'},
- {n:'Elara',e:2100,g:'♛',c:'#e8c982',q:'“Resign early. It saves time.”',d:4,r:4,b:0,qd:3,ms:1200,t:1400,tier:'Master'},
- {n:'Grandmaster',e:2400,g:'♚',c:'#d9505f',q:'“Good luck. You will need it.”',d:6,r:0,b:0,qd:3,ms:1400,t:2200,tier:'Master'}];
+ {n:'Pip',e:100,g:'♟',c:'#8fb7a0',q:'“Is this the pointy horse?”',d:1,r:600,b:.45,qs:0,ms:500,t:0,tier:'Beginner'},
+ {n:'Nora',e:250,g:'♟',c:'#b9a27a',q:'“I just like capturing things.”',d:1,r:380,b:.3,qs:0,ms:600,t:0,tier:'Beginner'},
+ {n:'Biscuit',e:400,g:'♞',c:'#c98f6b',q:'“Snacks first, strategy later.”',d:1,r:230,b:.18,ms:700,t:0,tier:'Beginner'},
+ {n:'Otto',e:600,g:'♞',c:'#7fa0c9',q:'“I know the openings. Mostly.”',d:2,r:150,b:.12,ms:800,t:0,tier:'Novice'},
+ {n:'Mira',e:800,g:'♝',c:'#a58cc9',q:'“Keep an eye on the diagonals.”',d:2,r:100,b:.08,ms:900,t:0,tier:'Novice'},
+ {n:'Dev',e:1000,g:'♜',c:'#d1a06a',q:'“Solid. Patient. Annoying.”',d:3,r:70,b:.05,ms:900,t:700,tier:'Novice'},
+ {n:'Juno',e:1200,g:'♝',c:'#6fb0c4',q:'“I set traps. Small ones.”',d:3,r:45,b:.03,ms:1000,t:800,tier:'Intermediate'},
+ {n:'Sasha',e:1400,g:'♝',c:'#7fc9b3',q:'“Your queen looks nervous.”',d:4,r:30,b:.015,ms:1000,t:1000,tier:'Intermediate'},
+ {n:'Kai',e:1600,g:'♛',c:'#e08a7a',q:'“I calculate three moves ahead.”',d:5,r:18,b:.006,ms:1000,t:1200,tier:'Intermediate'},
+ {n:'Ravi',e:1800,g:'♜',c:'#c9b45a',q:'“Every pawn is a promise.”',d:6,r:10,b:0,ms:1000,t:1400,tier:'Advanced'},
+ {n:'Elara',e:2000,g:'♛',c:'#e8c982',q:'“Resign early. It saves time.”',d:8,r:5,b:0,ms:1000,t:1800,tier:'Advanced'},
+ {n:'Viktor',e:2200,g:'♚',c:'#9a7fd1',q:'“I have seen this position before.”',d:12,r:0,v:14,b:0,ms:900,t:2500,tier:'Master'},
+ {n:'Grandmaster',e:2500,g:'♚',c:'#d9505f',q:'“Good luck. You will need it.”',d:64,r:0,v:10,b:0,ms:800,t:4000,tier:'Master'},
+ {n:'Moki Engine',e:2800,g:'♚',c:'#ff6a3d',q:'“No mercy. No mistakes.”',d:64,r:0,v:6,b:0,ms:600,t:7000,tier:'Master'}];
 function put(t,c,x,y){B[y][x]={t,c,m:0};const g=mk(t,c),[wx,wz]=pos(x,y);g.position.set(wx,0,wz);g.userData={pc:1,x,y};P[y][x]=g;S.add(g);pcs.push(g)}
 function newGame(){resetWreck();pcs.forEach(g=>S.remove(g));pcs=[];clr();
   B=Array.from({length:8},()=>Array(8).fill(null));P=Array.from({length:8},()=>Array(8).fill(null));
   const o='rnbqkbnr';for(let x=0;x<8;x++){put(o[x],'w',x,0);put('p','w',x,1);put('p','b',x,6);put(o[x],'b',x,7)}
   turn='w';sel=null;legalM=[];busy=true;over=false;started=false;moves=0;caps={w:[],b:[]};score={w:0,b:0};time={w:CFG.tc,b:CFG.tc};last=[];chk=null;
-  hist=[];resTxt='';selG=null;$('#ov').style.display='none';paint();ui();status();drawSheet();penRest();chkFx();tilesIn();
+  hist=[];resTxt='';selG=null;EP=null;ML=[];RP={};HM=0;RP[posKey()]=1;if(typeof engineReset=='function')engineReset();promoClose();$('#ov').style.display='none';paint();ui();status();drawSheet();penRest();chkFx();tilesIn();
   pcs.forEach((g,i)=>{g.position.y=7;g.scale.set(.01,.01,.01);
     anime({targets:g.position,y:0,duration:900,delay:650+i*28,easing:'easeOutBounce'});
     anime({targets:g.scale,x:1,y:1,z:1,duration:600,delay:650+i*28,easing:'easeOutBack'})});

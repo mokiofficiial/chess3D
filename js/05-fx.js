@@ -28,8 +28,9 @@ function paint(){for(let y=0;y<8;y++)for(let x=0;x<8;x++){let e=0;
   if(sel&&sel[0]==x&&sel[1]==y)e=0xb8892b;
   T[y][x].material.emissive.setHex(e)}}
 function clr(){while(hl.children.length)hl.remove(hl.children[0])}
-function showHL(){clr();if(!CFG.hints)return;legalM.forEach(m=>{const cp=B[m[1]][m[0]];
-  const h=new THREE.Mesh(cp?new THREE.TorusGeometry(.38,.05,8,32):new THREE.CylinderGeometry(.16,.16,.04,24),new THREE.MeshBasicMaterial({color:cp?0xd9505f:0xe8c982,transparent:true,opacity:.9}));
-  const [wx,wz]=pos(m[0],m[1]);h.position.set(wx,.05,wz);if(cp)h.rotation.x=Math.PI/2;hl.add(h);
+const HLG={dot:new THREE.CylinderGeometry(.16,.16,.04,24),ring:new THREE.TorusGeometry(.38,.05,8,32),sq:new THREE.BoxGeometry(.3,.05,.3),frame:new THREE.TorusGeometry(.42,.06,2,4)};
+function showHL(){clr();if(!CFG.hints)return;const mc=CFG.theme=='mc';legalM.forEach(m=>{const cp=B[m[1]][m[0]]||m[2]=='e';
+  const h=new THREE.Mesh(mc?(cp?HLG.frame:HLG.sq):(cp?HLG.ring:HLG.dot),new THREE.MeshBasicMaterial({color:cp?(mc?0xff4040:0xd9505f):(mc?0xffff55:0xe8c982),transparent:true,opacity:.9}));
+  const [wx,wz]=pos(m[0],m[1]);h.position.set(wx,.05,wz);if(cp){h.rotation.x=Math.PI/2;if(mc)h.rotation.z=Math.PI/4}hl.add(h);
   anime({targets:h.scale,x:[0,1],y:[0,1],z:[0,1],duration:450,easing:'easeOutElastic(1,.6)'})})}
 

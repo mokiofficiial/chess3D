@@ -5,14 +5,16 @@ function setFl(el,t){t=String(t);if(el.dataset.v===t)return;const fresh=el.child
   if(fresh)el.innerHTML=[...t].map(ch=>'<span'+(ch==':'?' class="c"':'')+'>'+ch+'</span>').join('');
   else[...t].forEach((ch,i)=>{const sp=el.children[i];if(sp.textContent!==ch){sp.textContent=ch;mo(sp,{rotateX:[-85,0],opacity:[.2,1]},{duration:.4})}})}
 function status(){const s=$('#st'),nm=turn=='w'?'White':'Black';s.className=chk?'chk':'';
-  s.textContent=over?'Game over':chk?'Check, '+nm+' to move':aiC()==turn?BOTS[lvl].n+' is thinking…':nm+"'s move"}
-function ui(){['w','b'].forEach(c=>{$('#n'+c).textContent=aiC()==c?BOTS[lvl].n:mode=='ai'?'You':c=='w'?'White':'Black';
+  const th=!over&&aiC()==turn;s.classList.toggle('think',th);s.textContent=over?'Game over':chk?'Check, '+nm+' to move':th?BOTS[lvl].n+' is thinking':mode=='ai'&&turn==human?'Your move':nm+"'s move";$('#brs').style.display=over||demo?'none':''}
+function ui(){['w','b'].forEach(c=>{$('#n'+c).textContent=aiC()==c?BOTS[lvl].n+' · '+BOTS[lvl].e:mode=='ai'?'You':c=='w'?'White':'Black';
   setFl($('#s'+c),String(score[c]).padStart(2,'0'));setFl($('#t'+c),fmt(time[c]));$('#t'+c).classList.toggle('low',CFG.tc>0&&started&&time[c]<=30);
-  $('#c'+c).textContent=caps[c].map(t=>SYM[opp(c)][t]+'\uFE0E').join('');$('#w'+c).textContent=wins[c];$('#p'+c).classList.toggle('on',turn==c&&!over)});
+  const df=score[c]-score[opp(c)],ord='qrbnp';$('#c'+c).innerHTML=caps[c].slice().sort((a,b)=>ord.indexOf(a)-ord.indexOf(b)).map(t=>SYM[opp(c)][t]+'\uFE0E').join('')+(df>0?'<em>+'+df+'</em>':'');$('#w'+c).textContent=wins[c];$('#p'+c).classList.toggle('on',turn==c&&!over)});
   setFl($('#mv'),String(moves).padStart(2,'0'));
   const k2=turn+over;if(k2!=bk){bk=k2;bars.forEach((b,i)=>{const on=!over&&turn==(i?'b':'w');anime.remove(b.material);anime({targets:b.material,emissiveIntensity:on?1.5:.08,duration:500,easing:'easeOutQuad'})})}}
-setInterval(()=>{if(started&&!over&&!paused&&CFG.tc&&!document.hidden){time[turn]--;if(time[turn]<=0){time[turn]=0;finish(opp(turn),'Time out')}ui()}},1000);
-$('#bn').onclick=()=>startGame();$('#ob').onclick=()=>startGame();
+setInterval(()=>{if(started&&!over&&!paused&&CFG.tc&&!document.hidden){time[turn]--;if(time[turn]<=0){time[turn]=0;if(noMate(B,opp(turn)))finish(null,'Time out, but no mating material left');else finish(opp(turn),'Time out')}ui()}},1000);
+$('#bn').onclick=()=>startGame();$('#ob').onclick=()=>startGame();$('#obb').onclick=()=>{$('#ov').style.display='none';openBots()};
+let rsT;$('#brs').onclick=()=>{const b=$('#brs');if(over||demo)return;if(!b.classList.contains('sure')){b.classList.add('sure');b.textContent='Sure? Tap again';clearTimeout(rsT);rsT=setTimeout(()=>{b.classList.remove('sure');b.textContent='Resign'},2600);return}
+  clearTimeout(rsT);b.classList.remove('sure');b.textContent='Resign';const loser=mode=='ai'?human:turn;finish(opp(loser),(mode=='ai'?'You resigned':(loser=='w'?'White':'Black')+' resigned'))};
 $('#bf').onclick=()=>anime({targets:cs,th:cs.th+Math.PI,duration:1000,easing:'easeInOutQuart',update:setCam});
 
 /* ---------- camera + input ---------- */
